@@ -3,9 +3,34 @@ var width = parseFloat(d3.select('#scatter').style('width'));
 var height = .66*width;
 var svg = d3.select('#scatter').append('svg').attr('width',width).attr('height',height);
 
+
 var xText = svg
         .append('g')
         .attr('transform',`translate(${width/2},${.97*height})`);
+
+var chosenXAxis = " ";
+var chosenYAxis = " ";
+        
+function xScale(data, chosenXAxis) {
+    var xLinearScale = d3.scaleLinear()
+      .domain([d3.min(data, d => d[chosenXAxis]) * 0.9,
+        d3.max(data, d => d[chosenXAxis]) * 1.1
+       ])
+        .range([0, width]);
+        
+    return xLinearScale;
+            
+}
+
+function yScale(data, chosenYAxis) {
+        
+    var yLinearScale = d3.scaleLinear()
+       .domain([d3.min(data, d => d[chosenYAxis])-2, d3.max(data, d => d[chosenYAxis])+2])
+       .range([height, 0]);
+        
+    return yLinearScale;
+        
+}
 
     xText
         .append('text')
@@ -49,7 +74,7 @@ var yText = svg
         .attr('y', 40)
         .text('Lacks Healthcare (%)')
         .attr('class','aText active y')
-        .attr('data-value','smokes');
+        .attr('data-value','healthcare');
 
     d3.selectAll('.aText').on('click', function() {
         if (d3.select(this).classed('x')){
@@ -66,3 +91,4 @@ var yText = svg
 d3.csv('assets/data/data.csv').then(data=>{
             console.log(data[10]);
         })
+
