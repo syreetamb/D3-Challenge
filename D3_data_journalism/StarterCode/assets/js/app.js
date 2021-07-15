@@ -15,8 +15,8 @@ var svg = d3.select('#scatter').append('svg').attr('width',svgWidth).attr('heigh
 var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
-var chosenXAxis = " ";
-var chosenYAxis = " ";
+var chosenXAxis = "poverty";
+var chosenYAxis = "healthcare";
         
 function xScale(data, chosenXAxis) {
     var xLinearScale = d3.scaleLinear()
@@ -27,7 +27,7 @@ function xScale(data, chosenXAxis) {
         
     return xLinearScale;
             
-}
+};
 
 function yScale(data, chosenYAxis) {
         
@@ -37,7 +37,7 @@ function yScale(data, chosenYAxis) {
         
     return yLinearScale;
         
-}
+};
 
 function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
 
@@ -48,7 +48,7 @@ function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
 
     return circlesGroup;
     
-}
+};
 
 function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
@@ -59,7 +59,7 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
     return circlesGroup;
     
-}
+};
 
 function renderXText(circledGroup, newXScale, chosenXAxis) {
 
@@ -69,7 +69,7 @@ function renderXText(circledGroup, newXScale, chosenXAxis) {
 
     return circlesGroup;
     
-}
+};
 
 function renderYText(circledGroup, newYScale, chosenYAxis) {
 
@@ -79,18 +79,21 @@ function renderYText(circledGroup, newYScale, chosenYAxis) {
 
     return circlesGroup;
     
-}
+};
 
 function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
     var xlabel;
     var ylabel;
 
-    if (chosenXAxis === "") {
-        xlabel = ":";
+    if (chosenXAxis === "Household Income (Median)") {
+        xlabel = "Household Income (Median):", d.income;
     } 
-    else if (chosenXAxis === "") {
-        xlabel = ":";
+    else if (chosenXAxis === "Age (Median") {
+        xlabel = "Age (Median):", d.age;
+    } 
+    else if (chosenXAxis === "In Poverty (%)") {
+        xlabel = "In Poverty (%):", d.poverty;
     }
 
     if (chosenYAxis === "") {
@@ -106,9 +109,9 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
         .style("color", "blue")
         .style("background", "white")
         .style("border", "black")
-        .style("border-width","" )
-        .style("border-radius", "")
-        .style("padding", "")
+        .style("border-width", width)
+        .style("border-radius", )
+        .style("padding", 0.05)
         .html(function(d) {
             return (`${d.state}<br>${xlabel} ${d[chosenXAxis]}%<br>${ylabel} ${d[chosenYAxis]}%`);
         });
@@ -117,13 +120,13 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
     circlesGroup.on("mouseover", function(data) {
         toolTip.show(data);
-    })
+    });
     circlesGroup.on("mouseout", function(data, index) {
         toolTip.hide(data);        
     });
 
     return circlesGroup;
-}
+};
 
 d3.csv('assets/data/data.csv').then(function(data,err) {
     data.forEach(d => {d.poverty = +d.poverty;
@@ -223,7 +226,7 @@ d3.csv('assets/data/data.csv').then(function(data,err) {
 
 });
 
-d3.csv('assets/data/data.csv').then(data=>{
-            console.log(data[10]);
-        })
+//d3.csv('assets/data/data.csv').then(data=>{
+           // console.log(data[10]);
+       // })
 
