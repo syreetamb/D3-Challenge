@@ -75,7 +75,8 @@ function renderData() {
     var xVal = d3.selectAll('.x').filter('.active').attr('data-value');
     var yVal = d3.selectAll('.y').filter('.active').attr('data-value');
 
-    d3.csv('assets/data/data.csv').then(data=>{
+    d3.csv('assets/data/data.csv').then(data => {
+
         var xData = data.map(data=> +data[xVal]);
         var yData = data.map(data=> +data[yVal]);
 
@@ -88,8 +89,7 @@ function renderData() {
             d3.max(xData) * 1.1])
             .range([0, width]);
     
-        return xLinearScale;
-    
+        return xLinearScale;    
     };
         
     function yScale() {
@@ -99,43 +99,41 @@ function renderData() {
             .range([height, 0]);
     
         return yLinearScale;
-    
     };
 
-    var bottomAxis = d3.axisBottom(xScale.xLinearScale);
+    var xAxis = d3.axisBottom(xScale);
 
-    var leftAxis = d3.axisLeft(yScale.yLinearScale);
+    var yAxis = d3.axisLeft(yScale);
 
-    // var xAxis = svg.append("g")
-    //     .attr("tranform", `translate(0, ${height})`)
-    //     .call(bottomAxis);
+    // var xAxis = svg.append('g')
+    //    .call(bottomAxis)  
+    //    .attr("tranform", `translate(0, ${height})`);
 
-    // var yAxis = svg.append("g")
+    // var yAxis = svg.append('g')
     //     .call(leftAxis);
+
+    var circlesGroup = d3.selectAll("circle")
+        .data(xVal, yVal)
+        .enter()
+        .append("g");
+
+    var circles = circlesGroup.append("circle")
+        .attr("d", d => xLinearScale(xData))
+        .attr("d", d => yLinearScale(yData))
+        .attr("r", 10)
+        .classed("stateCircle", true);
+
+    var circlesText = circlesGroup.append("text")
+        .text(d => d.abbr)
+        .attr("d", d => xLinearScale(xData))
+        .attr("d", d => yLinearScale(yData) + 5)
+        .classed("stateText", true);
 
     
 }
 
-
-
      
-//     var circlesGroup = .selectAll("circle")
-//         .data(data)
-//         .enter()
-//         .append("g");
-
-//     var circles = circlesGroup.append("circle")
-//         .attr("d", d => xLinearScale(xData))
-//         .attr("d", d => yLinearScale(yData))
-//         .attr("r", 10)
-//         .classed("stateCircle", true);
-
-//     var circlesText = circlesGroup.append("text")
-//         .text(d => d.abbr)
-//         .attr("d", d => xLinearScale(xData))
-//         .attr("d", d => yLinearScale(yData) + 5)
-//         .classed("stateText", true);
-
+    
 
 
 
