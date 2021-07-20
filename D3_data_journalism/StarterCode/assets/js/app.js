@@ -113,20 +113,20 @@ function renderData() {
     //     .call(leftAxis);
 
     var circlesGroup = d3.selectAll("circle")
-        .data(xVal, yVal)
+        .data(xVal)
         .enter()
         .append("g");
 
     var circles = circlesGroup.append("circle")
-        .attr("d", d => xLinearScale(xData))
-        .attr("d", d => yLinearScale(yData))
+        .attr("d", d => xScale(xVal))
+        .attr(yVal)
         .attr("r", 10)
         .classed("stateCircle", true);
 
     var circlesText = circlesGroup.append("text")
         .text(d => d.abbr)
-        .attr("d", d => xLinearScale(xData))
-        .attr("d", d => yLinearScale(yData) + 5)
+        .attr(d => xLinearScale(xData))
+        .attr(d => yLinearScale(yData) + 5)
         .classed("stateText", true);
 
     
