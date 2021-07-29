@@ -56,8 +56,10 @@ yText
     .attr('data-value', 'healthcare');
 
 var scaleLoc = svg.append('g').attr('transform',`translate(${0.1*width}, ${.85*height})`);
-var xScaleLoc = scaleLoc.append('g');
-var yScaleLoc = scaleLoc.append('g');
+var xScaleLoc = scaleLoc.append('g').transition().duration(200);
+var yScaleLoc = scaleLoc.append('g').transition().duration(200);
+
+renderData();
 
 d3.selectAll('.aText').on('click', function () {
     if (d3.select(this).classed('x')) {
@@ -69,6 +71,8 @@ d3.selectAll('.aText').on('click', function () {
     };
     d3.select(this).classed('inactive', false);
     d3.select(this).classed('active', true);
+
+    renderData();
 });
 
 function renderData() {
@@ -76,137 +80,111 @@ function renderData() {
     var yVal = d3.selectAll('.y').filter('.active').attr('data-value');
 
     d3.csv('assets/data/data.csv').then(data => {
-
+        var toolTip = d3.tip().attr('class','d3-tip')
+            .html(d=>`<div>${d.state}</div><div>${xVal}: ${d[xVal]}</div>`)
         var xData = data.map(data=> +data[xVal]);
         var yData = data.map(data=> +data[yVal]);
 
+        console.log(xData);
+   
+        var xScale = d3.scaleLinear().domain([d3.min(xData) * 0.9,d3.max(xData) * 1.1]).range([0, .8*width]);
+        var yScale = d3.scaleLinear().domain([d3.min(yData) - 2, d3.max(yData) + 2]).range([-.8*height, 0]);
 
-    })
+        xScaleLoc.call(d3.axisBottom(xScale))
+        yScaleLoc.call(d3.axisLeft(yScale))
 
-    function xScale() {
-        var xLinearScale = d3.scaleLinear()
-            .domain([d3.min(xData) * 0.9,
-            d3.max(xData) * 1.1])
-            .range([0, width]);
-    
-        return xLinearScale;    
-    };
+        var circles = scaleLoc.selectAll('g').data(data).enter().append('g').on('mouseover', function (d) {
+            toolTip.show(d, this);
+            d3.select(this).style('stroke','#e3e3e3');
+        });
+
+        circles.append('circle').attr('r', .02*width).attr('class','stateCircle');
+        circles.append('text').attr('class','stateText');    
+    });
+};
         
-    function yScale() {
-    
-        var yLinearScale = d3.scaleLinear()
-            .domain([d3.min(yData) - 2, d3.max(yData) + 2])
-            .range([height, 0]);
-    
-        return yLinearScale;
-    };
+//     var circlesGroup = d3.selectAll("circle")
+//         .data(xVal)
+//         .enter()
+//         .append("g");
 
-    var xAxis = d3.axisBottom(xScale);
+//     var circles = circlesGroup.append("circle")
+//         .attr("d", d => xScale(xVal))
+//         .attr(yVal)
+//         .attr("r", 10)
+//         .classed("stateCircle", true);
 
-    var yAxis = d3.axisLeft(yScale);
+//     var circlesText = circlesGroup.append("text")
+//         .text(d => d.abbr)
+//         .attr(d => xLinearScale(xData))
+//         .attr(d => yLinearScale(yData) + 5)
+//         .classed("stateText", true);
 
-    // var xAxis = svg.append('g')
-    //    .call(bottomAxis)  
-    //    .attr("tranform", `translate(0, ${height})`);
+ 
+// function renderXCircles(circles, xScale, xText) {
 
-    // var yAxis = svg.append('g')
-    //     .call(leftAxis);
-
-    var circlesGroup = d3.selectAll("circle")
-        .data(xVal)
-        .enter()
-        .append("g");
-
-    var circles = circlesGroup.append("circle")
-        .attr("d", d => xScale(xVal))
-        .attr(yVal)
-        .attr("r", 10)
-        .classed("stateCircle", true);
-
-    var circlesText = circlesGroup.append("text")
-        .text(d => d.abbr)
-        .attr(d => xLinearScale(xData))
-        .attr(d => yLinearScale(yData) + 5)
-        .classed("stateText", true);
-
-    
-}
-
-     
-    
-
-
-
-
-
-
-// });
-
-
-// function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
-
-//     circlesGroup.transition()
+//     circles.transition()
 //         .duration(500)
-//         .attr("d", d => newXScale(d[chosenXAxis]))
-//         .attr("d", d => newXScale(d[chosenXAxis]));
+//         .attr("d", d => xScale(d[xText]))
+//         .attr("d", d => xScale(d[xText]));
 
-//     return circlesGroup;
+//     return circles;
 
 // };
 
-// function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
+// function renderYCircles(circles, yScale, yText) {
 
-//     circlesGroup.transition()
+//     circles.transition()
 //         .duration(500)
-//         .attr("d", d => newYScale(d[chosenYAxis]))
-//         .attr("d", d => newYScale(d[chosenYAxis]));
+//         .attr("d", d => yScale(d[yText]))
+//         .attr("d", d => yScale(d[yText]));
 
-//     return circlesGroup;
+//     return circles;
 
 // };
 
-// function renderXText(circlesGroup, newXScale, chosenXAxis) {
+// function renderXText(circles, xScale, xText) {
 
-//     circlesGroup.transition()
+//     circles.transition()
 //         .duration(500)
-//         .attr("d", d => newXScale(d[chosenXAxis]));
+//         .attr("d", d => xScale(d[xText]));
 
-//     return circlesGroup;
+//     return circles;
 
 // };
 
-// function renderYText(circlesGroup, newYScale, chosenYAxis) {
+// function renderYText(circles, yScale, yText) {
 
-//     circlesGroup.transition()
+//     circles.transition()
 //         .duration(500)
-//         .attr("d", d => newYScale(d[chosenYAxis]));
+//         .attr("d", d => yScale(d[yText]));
 
-//     return circlesGroup;
+//     return circles;
 
 // };
 
-// function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
+// function updateToolTip(xText, yText, circles) {
 
 //     var xlabel;
 //     var ylabel;
 
-//     if (chosenXAxis === "income") {
+//     if (xText === "income") {
 //         xlabel = "Household Income (Median):", d.income;
 //     }
-//     else if (chosenXAxis === "age") {
+//     else if (xText === "age") {
 //         xlabel = "Age (Median):", d.age;
 //     }
-//     else if (chosenXAxis === "poverty") {
+//     else if (xText === "poverty") {
 //         xlabel = "In Poverty (%):", d.poverty;
 //     }
 
-//     if (chosenYAxis === "obesity") {
+//     if (yText === "obesity") {
 //         ylabel = "Obese (%):", d.obesity;
 //     }
-//     else if (chosenYAxis === "smokes") {
+//     else if (yText === "smokes") {
 //         ylabel = "Smoker (%):", d.smokes;
 //     }
-//     else if (chosenYAxis === "healthcare") {
+//     else if (yText === "healthcare") {
 //         ylabel = "Lacks Healthcare (%):", d.healthcare;
 //     }
 
@@ -221,23 +199,22 @@ function renderData() {
 //         .style("border-radius", 10)
 //         .style("padding", 0.05)
 //         .html(function (d) {
-//             return (`${d.state}<br>${xlabel} ${d[chosenXAxis]}%<br>${ylabel} ${d[chosenYAxis]}%`);
+//             return (`${d.state}<br>${xlabel} ${d[xText]}%<br>${ylabel} ${d[yText]}%`);
 //         });
 
-//     circlesGroup.call(toolTip);
+//     circles.call(toolTip);
 
-//     circlesGroup.on("mouseover", function (data) {
+//     circles.on("mouseover", function (data) {
 //         toolTip.show(data);
 //     });
-//     circlesGroup.on("mouseout", function (data, index) {
+//     circles.on("mouseout", function (data, index) {
 //         toolTip.hide(data);
 //     });
 
-//     return circlesGroup;
+//     return circles;
 // };
 
 
 // d3.csv('assets/data/data.csv').then(data => {
 //     console.log(data[10]);
-// })
-
+// });
