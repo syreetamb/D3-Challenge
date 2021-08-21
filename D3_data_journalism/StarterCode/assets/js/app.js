@@ -75,15 +75,20 @@ d3.selectAll('.aText').on('click', function () {
     renderData();
 });
 
+
+var toolTip = d3.tip().attr('class','d3-tip');
+
 function renderData() {
     let xVal = d3.selectAll('.x').filter('.active').attr('data-value');
     let yVal = d3.selectAll('.y').filter('.active').attr('data-value');
-    let toolTip = d3.tip().attr('class','d3-tip')
-
+    
     d3.csv('assets/data/data.csv').then(data => {
         let xData = data.map(data=> +data[xVal]);
         let yData = data.map(data=> +data[yVal]);
-            toolTip.html(d=>`<div>${d.state}</div><div>${xVal}: ${d[xVal]}</div><div>${yVal}: ${d[yVal]}</div>`)
+
+        toolTip.html(function(d) {
+            return `<div>${d.state}</div><div>${xVal}: ${d[xVal]}</div><div>${yVal}: ${d[yVal]}</div>`
+        });
 
         var xScale = d3.scaleLinear().domain([d3.min(xData) * 0.9,d3.max(xData) * 1.1]).range([0, .8*width]);
         var yScale = d3.scaleLinear().domain([d3.min(yData) - 2, d3.max(yData) + 2]).range([-.8*height, 0]);
